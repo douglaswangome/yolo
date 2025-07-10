@@ -126,6 +126,7 @@ services:
     build:
       context: ./backend # Specifies the build context (where the backend Dockerfile is located)
       dockerfile: Dockerfile # Specifies the Dockerfile to use (optional as it defaults to Dockerfile)
+    image: douglaswangome/ip2-backend:latest # Assigns a custom name to the image
     container_name: ip2-backend # Assigns a custom name to the container
     ports:
       - "5000:5000" # Maps port 5000 from the host to port 5000 in the container
@@ -143,6 +144,7 @@ services:
     build:
       context: ./client # Specifies the build context (where the backend Dockerfile is located)
       dockerfile: Dockerfile # Specifies the Dockerfile to use (optional as it defaults to Dockerfile)
+    image: douglaswangome/ip2-backend:latest # Assigns a custom name to the image
     container_name: ip2-client # Assigns a custom name to the container
     ports:
       - "3000:3000" # Maps port 3000 from the host to port 3000 in the container
@@ -177,6 +179,7 @@ volumes:
     </ul>
   </li>
   <li><strong><code>container_name</code>:</strong> Assigns a specific, human-readable name to the container instance. This makes it easier to identify and manage the container using <code>docker ps</code> or <code>docker logs</code>.</li>
+  <li><strong><code>image</code>:</strong> Assigns a specific Docker image to be used for the service. If the image is not available locally, Docker Compose will attempt to pull it from a Docker registry (Docker Hub). If used in conjunction with build, it will tag the newly built image with the specified name.</li>
   <li><strong><code>ports</code>:</strong> Maps ports from your host machine to the container's exposed ports.
     <ul>
       <li>Example: <code>"5000:5000"</code> means traffic on port <code>5000</code> on your host machine will be forwarded to port <code>5000</code> inside the container.</li>

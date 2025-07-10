@@ -8,6 +8,7 @@ services:
     build:
       context: ./backend # Specifies the build context (where the backend Dockerfile is located)
       dockerfile: Dockerfile # Specifies the Dockerfile to use (optional as it defaults to Dockerfile)
+    image: douglaswangome/ip2-backend:latest # Assigns a custom name to the image
     container_name: ip2-backend # Assigns a custom name to the container
     ports:
       - "5000:5000" # Maps port 5000 from the host to port 5000 in the container
@@ -25,6 +26,7 @@ services:
     build:
       context: ./client # Specifies the build context (where the backend Dockerfile is located)
       dockerfile: Dockerfile # Specifies the Dockerfile to use (optional as it defaults to Dockerfile)
+    image: douglaswangome/ip2-client:latest # Assigns a custom name to the image
     container_name: ip2-client # Assigns a custom name to the container
     ports:
       - "3000:3000" # Maps port 3000 from the host to port 3000 in the container
@@ -40,6 +42,7 @@ services:
 # Network Definition
 networks:
   ip2-network:
+    name: ip2-network
     driver: bridge # Defines a custom bridge network for inter-service communication
 
 # Volume Definitions
