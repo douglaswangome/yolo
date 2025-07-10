@@ -239,3 +239,6 @@ volumes:
   </ul>
   </li>
 </ol>
+
+### Screenshot of the pushed images
+![Screenshot of the images](image.png)
