@@ -47,4 +47,3 @@ volumes:
   backend_node_modules:
   client_node_modules:
   # I am not running MongoDB as a service hence no need to define its volume
-
