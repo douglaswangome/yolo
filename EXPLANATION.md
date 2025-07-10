@@ -59,4 +59,7 @@ EXPOSE 3000
 CMD [ "serve", "-s", "build", "-l", "3000" ]
 ```
 
+While building the Dockerfile above I had one major error:\
+- <b>My Internet</b> - This was a major issue as I was planning to use <code>node:16</code> so as to avoid potential compatibility issues. However, <code>node:16</code> is bigger in size in comparison to its alpine sister. So as to be able to run the container locally after building the image, I switched to alpine. I faced no comptability issues but that may be something to watch out for.
+
 ## Server
