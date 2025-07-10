@@ -61,10 +61,11 @@ EXPOSE 3000
 CMD [ "serve", "-s", "build", "-l", "3000" ]
 ```
 
-While building the Dockerfile above I had one major error:
-- <b>My Internet</b> - This was a major issue as I was planning to use <code>node:16</code> so as to avoid potential compatibility issues. However, <code>node:16</code> is bigger in size in comparison to its alpine sister. So as to be able to run the container locally after building the image, I switched to alpine. I faced no comptability issues but that may be something to watch out for.
+During the creation of the above Dockerfile, I encountered one major challenge:
 
-To run the image, I use (while in the client directory):
+- Internet Connectivity: My unstable internet connection was a significant issue. I initially planned to use node:16 to avoid potential compatibility problems. However, node:16 is considerably larger than its alpine counterpart. To successfully build and run the container locally, I switched to the alpine variant. I did not face any compatibility issues, but this is something to monitor in the future.
+
+To run the client image, I use the following command (executed from the client directory):
 ```bash
 docker run -p 3000:3000 #image_id
 ```
@@ -72,37 +73,40 @@ docker run -p 3000:3000 #image_id
 ## Backend
 Below is the Dockerfile for the client with comments to explain everything in great detail:
 ```Dockerfile
-# No stages needed in this Dockerfile as "serve" is not require
-# Specifies the base image upon which the new image will be built upon
+# No multi-stage build is required for this Dockerfile as 'serve' is not needed.
+
+# Specifies the base image upon which the new image will be built.
 FROM node:16-alpine
 
-# Sets the working directory for any instructions that come after this
+# Sets the working directory for subsequent instructions.
 WORKDIR /app
 
-# Copies new files or directories from the host machine(source) to inside the image(destination)
-# The asterisk(*) is a wildcard to indicate any files that has the word package as a prefix
-# The json(.json) is to specify that only json files that match the wildcard above.
+# Copies new files or directories from the host machine (source) to inside the image (destination).
+# The asterisk (*) is a wildcard, and the .json extension specifies that only JSON files
+# matching the 'package' prefix should be copied.
 COPY package*.json ./
 
-# This installs all the dependencies in the image
-# I would use "npm i" but "npm ci" ensures that the correct versions are installed
+# Installs all dependencies in the image.
+# I chose "npm ci" over "npm i" to ensure that the exact versions specified in package-lock.json are installed,
+# promoting consistent builds.
 # RUN npm i
 RUN npm ci
 
-# Copies new files or directories from the host machine(source) to inside the image(destination)
+# Copies the rest of the application files from the host machine to the image.
 COPY . .
 
-# Expose the port 
+# Exposes port 5000, making it accessible from outside the container.
 EXPOSE 5000
 
-# Command to run the backend server
+# Defines the command to run when the container starts, launching the Node.js server.
 CMD [ "node", "server.js" ]
-
 ```
-While building the Dockerfile above I had one major error:
-- <b>The .env file</b> - It is customary to ignore the .env file while copying the directory and its contents. My env variable had double quotes and this led to errors while running the command below with the <code>--env-file .env</code> flag. This led to the env being misinterpreted and the backend not starting up.
 
-To run the image, I use (while in the backend directory):
+During the creation of the above Dockerfile, I encountered one major challenge:
+
+- The .env file: It is customary to exclude the .env file when copying the application directory. However, my environment variable (specifically the MONGODB_URI value) contained double quotes within the .env file. This led to errors when attempting to run the container with the --env-file .env flag, as Docker misinterpreted the environment variable, preventing the backend from starting correctly.
+
+To run the backend image, I use the following command (executed from the backend directory):
 ```bash
 docker run -p 5000:5000 --env-file .env #image_id
 ```

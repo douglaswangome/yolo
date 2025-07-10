@@ -1,25 +1,27 @@
-# No stages needed in this Dockerfile as "serve" is not require
-# Specifies the base image upon which the new image will be built upon
+# No multi-stage build is required for this Dockerfile as 'serve' is not needed.
+
+# Specifies the base image upon which the new image will be built.
 FROM node:16-alpine
 
-# Sets the working directory for any instructions that come after this
+# Sets the working directory for subsequent instructions.
 WORKDIR /app
 
-# Copies new files or directories from the host machine(source) to inside the image(destination)
-# The asterisk(*) is a wildcard to indicate any files that has the word package as a prefix
-# The json(.json) is to specify that only json files that match the wildcard above.
+# Copies new files or directories from the host machine (source) to inside the image (destination).
+# The asterisk (*) is a wildcard, and the .json extension specifies that only JSON files
+# matching the 'package' prefix should be copied.
 COPY package*.json ./
 
-# This installs all the dependencies in the image
-# I would use "npm i" but "npm ci" ensures that the correct versions are installed
+# Installs all dependencies in the image.
+# I chose "npm ci" over "npm i" to ensure that the exact versions specified in package-lock.json are installed,
+# promoting consistent builds.
 # RUN npm i
 RUN npm ci
 
-# Copies new files or directories from the host machine(source) to inside the image(destination)
+# Copies the rest of the application files from the host machine to the image.
 COPY . .
 
-# Expose the port 
+# Exposes port 5000, making it accessible from outside the container.
 EXPOSE 5000
 
-# Command to run serve on the build directory
+# Defines the command to run when the container starts, launching the Node.js server.
 CMD [ "node", "server.js" ]
