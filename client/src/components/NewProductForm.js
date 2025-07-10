@@ -1,20 +1,20 @@
 import React from 'react';
-// import {v4} from 'uuid';
+import {v4} from 'uuid';
 import PropTypes from 'prop-types';
 import ReusableForm from './ReusableForm';
 
 function NewProductForm (props) {
     
 
-    // function onFileChange(event){
-    //     // console.log(event.target.files[0])
-    //     // const file=  event.target.files[0]
+    function onFileChange(event){
+        // console.log(event.target.files[0])
+        // const file=  event.target.files[0]
         
 
-    //     props.onPhotoUpload({
-    //         file: event.target.files[0]
-    //     })
-    // }
+        props.onPhotoUpload({
+            file: event.target.files[0]
+        })
+    }
 
     function handleNewProductFormSubmission(event){
         // event.persist()
@@ -30,7 +30,7 @@ function NewProductForm (props) {
             price: event.target.price.value,
             description: event.target.description.value,
             quantity: event.target.quantity.value,
-            // id: v4()
+            id: v4()
         });
     }
    
