@@ -1,0 +1,50 @@
+# Specifies the Docker Compose file format version
+# version: '3.8'
+# The attribute `version` is obsolete, that's why it has been comment out
+
+services:
+  # Backend Service Definition
+  backend: 
+    build:
+      context: ./backend # Specifies the build context (where the backend Dockerfile is located)
+      dockerfile: Dockerfile # Specifies the Dockerfile to use (optional as it defaults to Dockerfile)
+    container_name: ip2-backend # Assigns a custom name to the container
+    ports:
+      - "5000:5000" # Maps port 5000 from the host to port 5000 in the container
+    env_file: # Specifies an environment file to load variables from
+      - ./backend/.env # Path to the .env file, relative to this file
+    networks:
+      - ip2-network # Connects the backend service to the custom network
+    volumes:
+      # This volume is used to persist node_modules to speed up subsequent builds
+      # This prevents repeated downloads.
+      - backend_node_modules:/app/node_modules
+      
+  # Client Service Definition
+  client:
+    build:
+      context: ./client # Specifies the build context (where the backend Dockerfile is located)
+      dockerfile: Dockerfile # Specifies the Dockerfile to use (optional as it defaults to Dockerfile)
+    container_name: ip2-client # Assigns a custom name to the container
+    ports:
+      - "3000:3000" # Maps port 3000 from the host to port 3000 in the container
+    depends_on:
+      - backend # Ensures the backend service starts before the client service
+    networks:
+      - ip2-network # Connects the client service to the custom network
+    volumes:
+      # This volume is used to persist node_modules to speed up subsequent builds
+      # This prevents repeated downloads.
+      - client_node_modules:/app/node_modules
+
+# Network Definition
+networks:
+  ip2-network:
+    driver: bridge # Defines a custom bridge network for inter-service communication
+
+# Volume Definitions
+volumes:
+  backend_node_modules:
+  client_node_modules:
+  # I am not running MongoDB as a service hence no need to define its volume
+
