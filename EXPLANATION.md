@@ -71,7 +71,7 @@ docker run -p 3000:3000 #image_id
 ```
 
 ## Backend
-Below is the Dockerfile for the client with comments to explain everything in great detail:
+Below is the Dockerfile for the Backend with comments to explain everything in great detail:
 ```Dockerfile
 # No multi-stage build is required for this Dockerfile as 'serve' is not needed.
 
@@ -144,7 +144,7 @@ services:
     build:
       context: ./client # Specifies the build context (where the backend Dockerfile is located)
       dockerfile: Dockerfile # Specifies the Dockerfile to use (optional as it defaults to Dockerfile)
-    image: douglaswangome/ip2-backend:latest # Assigns a custom name to the image
+    image: douglaswangome/ip2-client:latest # Assigns a custom name to the image
     container_name: ip2-client # Assigns a custom name to the container
     ports:
       - "3000:3000" # Maps port 3000 from the host to port 3000 in the container
@@ -160,6 +160,7 @@ services:
 # Network Definition
 networks:
   ip2-network:
+    name: ip2-network
     driver: bridge # Defines a custom bridge network for inter-service communication
 
 # Volume Definitions
