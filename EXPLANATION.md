@@ -65,6 +65,11 @@ During the creation of the above Dockerfile, I encountered one major challenge:
 
 - Internet Connectivity: My unstable internet connection was a significant issue. I initially planned to use node:16 to avoid potential compatibility problems. However, node:16 is considerably larger than its alpine counterpart. To successfully build and run the container locally, I switched to the alpine variant. I did not face any compatibility issues, but this is something to monitor in the future.
 
+To build the client image, I use the following command (executed from the client directory):
+```bash
+docker build -t douglaswangome:latest .
+```
+
 To run the client image, I use the following command (executed from the client directory):
 ```bash
 docker run -p 3000:3000 #image_id
@@ -105,6 +110,8 @@ CMD [ "node", "server.js" ]
 During the creation of the above Dockerfile, I encountered one major challenge:
 
 - The .env file: It is customary to exclude the .env file when copying the application directory. However, my environment variable (specifically the MONGODB_URI value) contained double quotes within the .env file. This led to errors when attempting to run the container with the --env-file .env flag, as Docker misinterpreted the environment variable, preventing the backend from starting correctly.
+
+To build the backend image, I use the following command ()
 
 To run the backend image, I use the following command (executed from the backend directory):
 ```bash
