@@ -1,0 +1,4 @@
+backend_port: 3000
+frontend_port: 8080
+repo_url: "https://github.com/douglaswangome/yolo.git"
+app_dir: "/home/vagrant/yolo"
