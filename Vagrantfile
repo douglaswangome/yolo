@@ -27,9 +27,24 @@ Vagrant.configure("2") do |config|
   # This block executes commands on the guest VM after it has been booted.
   config.vm.provision "shell", inline: <<-SHELL
     # Updates the package lists for upgrades and new package installations.
-    apt-get update
+    sudo apt-get update
     # Installs Python 3 and pip (package installer for Python) on the VM.
     # The -y flag automatically answers yes to prompts.
-    apt-get install -y python3 python3-pip
+    sudo apt-get install -y python3 python3-pip
   SHELL
+
+  # This tells Vagrant to run your Ansible playbook (site.yml) on the guest VM.
+  config.vm.provision "ansible" do |ansible|
+    # Specifies the main playbook file to execute.
+    ansible.playbook = "ansible/site.yml"
+    # Points to the directory where your roles are located relative to the playbook.
+    ansible.roles_path = "ansible/roles"
+    # By default, Vagrant uses a dynamic inventory. Explicitly telling it where
+    # your group_vars are ensures they are picked up.
+    ansible.limit = "all" # Apply the playbook to all hosts in the inventory
+    ansible.raw_ssh_args = ["-o StrictHostKeyChecking=no"] # For development convenience
+    ansible.inventory_path = ".vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory" # Vagrant's dynamic inventory path
+    # If you were to use a static inventory file, you'd specify:
+    # ansible.inventory_path = "ansible/inventory/hosts"
+  end
 end
