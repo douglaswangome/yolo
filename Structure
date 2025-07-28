@@ -1,8 +1,13 @@
-ansible/
-├── site.yml
-├── roles/
-│   ├── backend/
-│   └── client/
-├── group_vars/
-│   └── all.yml
-└── requirements.yml
+yolo/
+├── Vagrantfile
+├── ansible/
+│   ├── site.yml
+│   ├── group_vars/
+│   │   └── all.yml
+│   └── roles/
+│       ├── backend/
+│       │   └── tasks/
+│       │       └── main.yml
+│       └── frontend/
+│           └── tasks/
+│               └── main.yml
