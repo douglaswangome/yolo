@@ -1,0 +1,33 @@
+---
+- hosts: all
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+  tasks:
+    - name: Install required system packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+        - python3-pip
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+    - name: Install Docker Python module
+      pip:
+        name: docker
+    - name: Add vagrant to docker group
+      user:
+        name: vagrant
+        groups: docker
+        append: yes
+
+  roles:
+    - { role: backend, tags: ["backend"] }
+    - { role: frontend, tags: ["frontend"] }
