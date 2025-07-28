@@ -1,0 +1,48 @@
+---
+# This task is responsible for building the Docker image for the frontend application.
+- name: Build frontend Docker image
+  # The 'community.docker.docker_image' module is used to manage Docker images.
+  community.docker.docker_image:
+    # 'name: yolo-frontend' assigns a name to the Docker image that will be built.
+    name: yolo-frontend
+    # The 'build' block defines the context for building the Docker image.
+    build:
+      # 'path: "{{ app_dir }}/frontend"' specifies the build context for the frontend.
+      # It assumes the frontend Dockerfile and related assets are located in a 'frontend'
+      # subdirectory within the main application directory ('app_dir').
+      path: "{{ app_dir }}/frontend"
+      # 'dockerfile: Dockerfile' explicitly states the name of the Dockerfile to use for the frontend.
+      dockerfile: Dockerfile
+
+# This task runs the Docker container for the frontend application.
+- name: Run frontend container
+  # The 'community.docker.docker_container' module is used to manage Docker containers.
+  community.docker.docker_container:
+    # 'name: yolo-frontend' assigns a name to the running container instance for the frontend.
+    name: yolo-frontend
+    # 'image: yolo-frontend' specifies that the container should be created from
+    # the 'yolo-frontend' Docker image built in the previous task.
+    image: yolo-frontend
+    # 'state: started' ensures that the container is running. If it's not running, it will be started.
+    state: started
+    # 'restart_policy: always' configures the container to automatically restart
+    # if it stops for any reason, including host reboots.
+    restart_policy: always
+    # 'ports' maps ports from the host machine to the container.
+    # It maps the host port (defined by 'frontend_port' variable, e.g., 8080)
+    # to port 80 inside the container, which is the standard HTTP port where
+    # most web servers (like Nginx or Apache) serving frontend assets listen.
+    ports:
+      - "{{ frontend_port }}:80"
+    # 'links' creates a legacy link to another container.
+    # This allows the frontend container to resolve 'yolo-backend' to the IP address
+    # of the backend container within its own network, enabling communication.
+    # Note: For new deployments, Docker networks are generally preferred over 'links'.
+    links:
+      - yolo-backend
+    # 'volumes' mounts host paths into the container.
+    # This creates a bind mount, linking the frontend application directory on the host
+    # ('app_dir/frontend') to '/app' inside the container. This is useful for serving
+    # static assets or for development purposes.
+    volumes:
+      - "{{ app_dir }}/frontend:/app"
