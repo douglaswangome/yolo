@@ -1,0 +1,11 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for clone_repo
+- name: Clone my git repository
+  ansible.builtin.git:
+    repo: "https://github.com/douglaswangome/yolo.git"
+    dest: "/home/vagrant/yolo"
+    version: master
+    single_branch: yes
+  become: no
+  become_user: vagrant

@@ -1,0 +1,10 @@
+- hosts: all
+  become: true
+
+  roles:
+    - install_docker
+    - install_git
+    - clone_repo
+    - network_deployment
+    - backend_deployment
+    - frontend_deployment

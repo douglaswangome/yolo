@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for network_deployment
+- name: Create a custom Docker bridge network for the frontend and backend
+  community.docker.docker_network:
+    name: yolo_network
+    driver: bridge
+    state: present
+  become: yes
+  become_user: vagrant
