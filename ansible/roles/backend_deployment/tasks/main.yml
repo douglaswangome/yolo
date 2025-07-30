@@ -13,7 +13,7 @@
 - name: Add an entry to the .env file
   ansible.builtin.lineinfile:
     path: /home/vagrant/yolo/backend/.env
-    line: "MONGODB_URI=mongodb+srv://douglaswangome:POBNceeunYxdpEud@yolomy.m1ms1dd.mongodb.net/?retryWrites=true&w=majority&appName=yolomy"
+    line: "MONGODB_URI=mongodb+srv://douglaswangome:m7BNXS976KGvskKn@yolomy.m1ms1dd.mongodb.net/?retryWrites=true&w=majority&appName=yolomy"
     # Create the file if it doesn't exist
     create: yes
     owner: vagrant
