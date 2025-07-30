@@ -1,4 +1,0 @@
----
-# vars file for backend role
-# Define variables specific to this role here.
-# Often used for sensitive data (if vaulted) or variables not meant to be easily overridden.
