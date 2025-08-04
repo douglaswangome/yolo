@@ -64,3 +64,42 @@ This project uses Ansible to automate the deployment of a full-stack application
 - **`playbook.yaml`**: This is the main Ansible playbook. It orchestrates the entire deployment process by calling the roles in a specific order to build and deploy the application.
 - **`README.md`**:
 - **`Vagrantfile`**: This file is used by Vagrant to define and configure virtual machines. It specifies the base box, network settings, and provisioners to create a consistent, reproducible development environment.
+
+### Ansible Playbook (`playbook.yaml`)
+
+- **`hosts: all`**: This line specifies that the playbook will run on all hosts defined in our `hosts` inventory file.
+- **`become: yes`**: This tells Ansible to use privilege escalation (`sudo`) to run tasks with elevated permissions. This is necessary for system-level changes like installing software or configuring services.
+- **`roles:`**: This section lists the Ansible roles that will be executed. The order in which they are listed is crucial, as Ansible executes tasks sequentially from top to bottom.
+
+### Explanation of Role Execution Order
+
+The order of the roles in this playbook is carefully structured to ensure all dependencies are met before a subsequent step is attempted. A playbook runs sequentially, meaning one role's completion is a prerequisite for the next.
+
+1.  **`install_docker`**:
+
+    - **Function**: This role is placed first because our services (backend, frontend) will be deployed using Docker containers. Docker needs to be installed and configured on the target servers before any container-related tasks can be performed.
+    - **Reasoning for Position**: It's a foundational dependency. Without Docker, the other roles that interact with containers would fail.
+
+2.  **`install_git`**:
+
+    - **Function**: This role ensures that Git is installed on the target machine. Git is required to clone the application source code from a repository.
+    - **Reasoning for Position**: It's an immediate dependency for the `clone_repo` role. You can't clone a repository if Git isn't installed. It's placed after `install_docker` because the order between these two doesn't have a strict dependency, but it's good practice to install fundamental tools first.
+
+3.  **`clone_repo`**:
+
+    - **Function**: This role clones the application's source code from a specified Git repository to a directory on the target host.
+    - **Reasoning for Position**: This must run after `install_git` as it depends on Git being present. The cloned code is then used by the `backend_deployment` and `frontend_deployment` roles.
+
+4.  **`network_deployment`**:
+
+    - **Function**: This role configures network-related settings for Docker. This is critical for making the deployed application accessible to the outside world.
+    - **Reasoning for Position**: It's best to set up networking after the necessary infrastructure and application code are in place. This allows the network configuration to point to the correct running services and ports.
+
+5.  **`backend_deployment`**:
+
+    - **Function**: This role handles the deployment of the backend application. This typically involves building the application, configuring its environment, and starting it as a service.
+    - **Reasoning for Position**: This role depends on the application code being available (from `clone_repo`) and Docker being installed.
+
+6.  **`frontend_deployment`**:
+    - **Function**: This role deploys the frontend application.
+    - **Reasoning for Position**: Similar to the backend, it depends on the application code (`clone_repo`) and a docker network configured in the `network_deployment` step. It is placed last to ensure all foundational pieces are in place before the user-facing part of the application is deployed.
