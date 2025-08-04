@@ -1,0 +1,20 @@
+yolo/
+├── ansible/
+│   ├── roles/
+│   │   ├── backend_deployment/
+│   │   ├── clone_repo/
+│   │   ├── frontend_deployment/
+│   │   ├── install_docker/
+│   │   ├── install_git/
+│   │   └── network_deployment/
+├── backend/
+├── client/
+├── .gitignore
+├── ansible.cfg
+├── docker-compose.yaml
+├── EXPLANATION.md
+├── hosts
+├── image.png
+├── playbook.yaml
+├── README.md
+└── Vagrantfile
