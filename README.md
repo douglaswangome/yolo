@@ -1,5 +1,7 @@
 # Kubernetes Deployment Plan for IP2 Application
 
+The public URL of the frontend is: http://206.189.252.191:3000/
+
 ## Overview
 
 This document describes the work I have completed so far in preparing my **IP2 Application** (React.js frontend + Node.js backend + MongoDB database) for deployment on **Kubernetes** using **DigitalOcean Kubernetes Service (DOKS)**.
