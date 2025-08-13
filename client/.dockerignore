@@ -1,3 +1,4 @@
 # Tells docker what folder and files to ignore
 # I will ignore the node modules since I am already copying the package.json and package-lock.json files
 node_modules
+.env

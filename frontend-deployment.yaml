@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: douglaswangome/ip2-client:v1.0.4
+          image: douglaswangome/ip2-client:v1.0.7
           ports:
             - containerPort: 3000
           env:
