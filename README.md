@@ -180,3 +180,117 @@ My final deployment plan incorporates a number of best practices that are crucia
 - **Using Unique Image Tags**: This ensures that every update is deliberate and traceable, preventing unexpected behavior from image caching and providing a simple rollback mechanism.
 - **Separating Services**: The frontend and backend have distinct Service types—`LoadBalancer` for the public-facing frontend and `ClusterIP` for the internal backend—to optimize both accessibility and security.
 - **Using Secrets for Configuration**: Sensitive information like the MongoDB URI and the backend API URL are stored in Kubernetes Secrets. This is a critical security measure that prevents credentials from being exposed in public repositories or container images.
+
+# IP3: Automating Deployment with Ansible and Vagrant
+
+IP3, focuses on automating the deployment of the IP2 application using **Ansible and Vagrant**. This approach significantly streamlines the process, ensuring consistent and reproducible deployments across different environments, from local development to production. I used Vagrant to provision a local virtual machine (VM) and Ansible to automate the entire deployment workflow within that VM. This section details the role of each configuration file and explains the deployment architecture.
+
+---
+
+## 1\. Local Development Environment with Vagrant
+
+To create a consistent and isolated environment for testing the Ansible playbook, I used **Vagrant**. The `Vagrantfile` is the core of this setup, defining the VM's specifications and provisioning steps.
+
+### **The `Vagrantfile`**
+
+```ruby
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "geerlingguy/ubuntu2004"
+  config.vm.box_version = "1.0.4"
+
+  config.vm.network "forwarded_port", guest: 3000, host: 3000, auto_correct: false
+  config.vm.network "forwarded_port", guest: 5000, host: 5000, auto_correct: false
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook.yaml"
+    ansible.verbose = "v"
+    ansible.ask_vault_pass = true
+  end
+end
+```
+
+The `Vagrantfile` is configured to create a VM based on the `geerlingguy/ubuntu2004` box, version `1.0.4`. This ensures that everyone working on the project starts with the same clean Ubuntu 20.04 environment. [It also sets up port forwarding, directing traffic from the host machine's port `3000` to the guest VM's port `3000` (for the frontend) and from the host's port `5000` to the guest's port `5000` (for the backend). This allows me to access the application running inside the VM directly from my host's browser. The most critical part of this file is the `ansible.provision` block, where I tell Vagrant to use Ansible to provision the VM by executing the `playbook.yaml` file. This ensures that as soon as the VM is up and running, Ansible automatically takes over to install dependencies, clone the repository, and deploy the entire application.
+
+---
+
+## 2\. Automating the Deployment with Ansible
+
+Ansible is an automation tool that simplifies complex tasks like software installation and application deployment. I used it to define a repeatable and reliable deployment process.
+
+### **The `ansible.cfg` file**
+
+```cfg
+[defaults]
+inventory = hosts
+remote_user = vagrant
+private_key_file = .vagrant/machines/default/virtualbox/private_key
+roles_path = ./ansible/roles
+host_key_checking = False
+```
+
+This file contains the default configurations for the Ansible playbook. It specifies the inventory file as `hosts`, which tells Ansible where to find the target machines. The `remote_user` is set to `vagrant`, which is the default user for the VM, and the `private_key_file` is specified to allow Ansible to authenticate without a password. This configuration is essential for establishing a secure and automated connection to the VM.
+
+### **The `hosts` file**
+
+```ini
+[all]
+ansible_host=127.0.0.1 port=2222
+```
+
+The `hosts` file serves as the inventory for Ansible. In this simple setup, it defines a single target machine group called `all`. The `ansible_host` is set to `127.0.0.1` and the `port` to `2222`, which is how Vagrant forwards the SSH connection from the host machine to the guest VM.
+
+### **The `playbook.yaml` file**
+
+```yaml
+- name: Deploy YOLO on VM using Ansible
+  hosts: all
+  become: yes
+  vars_files:
+    - ansible/secrets.yml
+
+  roles:
+    - install_docker
+    - install_git
+    - clone_repo
+    - network_deployment
+    - backend_deployment
+    - frontend_deployment
+```
+
+This is the main orchestration file for Ansible. It defines a series of roles that are executed in a specific order to deploy the IP2 application. The playbook is designed to be idempotent, meaning it can be run multiple times without causing unintended side effects. The roles include:
+
+- `install_docker`: Installs Docker on the VM.
+- `install_git`: Installs Git to clone the application repository.
+- `clone_repo`: Clones the application's source code from a remote repository.
+- `network_deployment`: Configures the network for the application.
+- `backend_deployment`: Deploys the Node.js backend.
+- `frontend_deployment`: Deploys the React.js frontend.
+
+This structured approach makes the deployment process modular, easy to understand, and simple to debug.
+
+**Debugging Note:** I initially struggled with the `secrets.yml` file, where I mistakenly saved sensitive information as a `.env` file instead of the correct YAML format required by Ansible. This caused the playbook to fail, and I had to debug and correct the file format to ensure the secrets were correctly loaded. \
+**While running `vagrant provision`, you will be asked for a Vault password which is 12345.\
+This should be used while running the app, is a placeholder for sensitive information.**
+
+# What I've Learnt
+
+During the deployment process, I encountered several key challenges that taught me crucial lessons about both local development and live deployments on Kubernetes. These debugging experiences were fundamental to creating a robust and professional deployment plan.
+
+### **Kubernetes Image Caching**
+
+A significant issue I faced was Kubernetes not pulling the new Docker image after a successful push to the registry. The pods would continue to run with a stale, older version of the application. My initial assumption was that using the `:latest` tag would force a new pull, but I discovered that Kubernetes, by default, caches images on each node. The `kubelet` only checks for a new image if the image tag in the deployment manifest is changed. Simply pushing a new image with the same `:latest` tag does not trigger an update.
+
+The definitive solution was to adopt a best practice of using a unique, immutable version tag for each new image (e.g., `douglaswangome/ip2-client:v1.0.0`). By updating the deployment manifest to reference this specific tag, I could guarantee that Kubernetes would pull the correct version and trigger a seamless rolling update. This ensures every deployment is intentional, traceable, and reproducible.
+
+### **Network Service Types and Security**
+
+Another key learning came from an error in my initial Kubernetes manifest for the backend. I had mistakenly used a `LoadBalancer` service type for the backend, which is designed to expose a service to the public internet. This was unnecessary and a significant security risk, as the backend API should only be accessible from within the cluster.
+
+I corrected this by changing the backend service's type to `ClusterIP`. This made the backend accessible only to other services within the cluster, such as the frontend. The frontend can still communicate with the backend using its internal service name (`ip2-backend`), a much more secure and reliable pattern than using hardcoded public IP addresses. I learned that carefully selecting the appropriate service type is critical for balancing accessibility with security in a Kubernetes environment.
+
+### **Ansible Secrets Management**
+
+Finally, a specific debugging experience with my Ansible setup taught me about the importance of correct file formatting. I had trouble with my secrets management because I saved sensitive information as a `.env` file instead of the required `.yml` format. This simple mistake caused the playbook to fail and highlighted the necessity of paying close attention to file types and syntax when working with configuration management tools.
