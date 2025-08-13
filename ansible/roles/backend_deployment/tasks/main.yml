@@ -1,27 +1,6 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for backend_deployment
-- name: Create .env file in the cloned repo directory
-  ansible.builtin.file:
-    path: /home/vagrant/yolo/backend/.env
-    state: touch
-    mode: "0644"
-    owner: vagrant
-    group: vagrant
-  become: yes
-
-- name: Add an entry to the .env file
-  ansible.builtin.lineinfile:
-    path: /home/vagrant/yolo/backend/.env
-    line: "MONGODB_URI=mongodb+srv://douglaswangome:m7BNXS976KGvskKn@yolomy.m1ms1dd.mongodb.net/?retryWrites=true&w=majority&appName=yolomy"
-    # Create the file if it doesn't exist
-    create: yes
-    owner: vagrant
-    group: vagrant
-    mode: "0644"
-  become: yes
-  become_user: vagrant
-
 - name: Build backend Docker image from Dockerfile
   community.docker.docker_image:
     name: yolo_backend
@@ -43,6 +22,7 @@
       - name: yolo_network
     ports:
       - "5000:5000"
-    env_file: /home/vagrant/yolo/backend/.env
+    env:
+      MONGODB_URI: "{{ MONGODB_URI }}"
   become: yes
   become_user: vagrant

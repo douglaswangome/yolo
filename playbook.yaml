@@ -1,5 +1,8 @@
-- hosts: all
+- name: Deply YOLO on VM using Ansible
+  hosts: all
   become: yes
+  vars_files:
+    - ansible/secrets.yml
 
   roles:
     - install_docker
