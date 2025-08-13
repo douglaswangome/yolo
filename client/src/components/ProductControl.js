@@ -76,12 +76,14 @@ class ProductControl extends Component {
   }
 
   componentDidMount() {
-    axios.get("http://localhost:5000/api/products").then((res) => {
-      console.log(res);
-      this.setState({
-        actualProductList: res.data,
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_URL}/api/products/`)
+      .then((res) => {
+        console.log(res);
+        this.setState({
+          actualProductList: res.data,
+        });
       });
-    });
   }
   handleEditProductClick = () => {
     console.log("HandleEditClick reached!!");
@@ -156,7 +158,7 @@ class ProductControl extends Component {
     // }
     // console.log(...formData)
     axios
-      .post("http://localhost:5000/api/products", newProduct)
+      .post(`${process.env.REACT_APP_BACKEND_URL}/api/products/`, newProduct)
       .then((res) => console.log(res.data));
     this.setState({
       formVisibleOnPage: false,
@@ -164,7 +166,7 @@ class ProductControl extends Component {
   };
   handleDeletingProduct = (id) => {
     axios
-      .delete("http://localhost:5000/api/products/" + id)
+      .delete(`${process.env.REACT_APP_BACKEND_URL}/api/products/` + id)
       .then((res) => console.log(res.data))
       .catch((error) => {
         console.log(error);
@@ -189,7 +191,8 @@ class ProductControl extends Component {
   handleEditingProduct = (editedProduct) => {
     axios
       .put(
-        "http://localhost:5000/api/products/" + this.state.selectedProduct._id,
+        `${process.env.REACT_APP_BACKEND_URL}/api/products/` +
+          this.state.selectedProduct._id,
         editedProduct
       )
       .then((res) => console.log(res.data));

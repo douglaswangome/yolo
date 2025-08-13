@@ -30,6 +30,8 @@ services:
     container_name: ip2-client # Assigns a custom name to the container
     ports:
       - "3000:3000" # Maps port 3000 from the host to port 3000 in the container
+    env_file:
+      - ./client/.env # Path to the .env file, relative to this file
     depends_on:
       - backend # Ensures the backend service starts before the client service
     networks:
