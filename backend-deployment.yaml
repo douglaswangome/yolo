@@ -19,7 +19,11 @@ spec:
             - containerPort: 5000
           env:
             - name: MONGODB_URI
-              value: "mongodb+srv://douglaswangome:m7BNXS976KGvskKn@yolomy.m1ms1dd.mongodb.net/?retryWrites=true&w=majority&appName=yolomy"
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGODB_URI
+
 ---
 apiVersion: v1
 kind: Service
@@ -31,4 +35,4 @@ spec:
   ports:
     - port: 5000
       targetPort: 5000
-  clusterIP: None
+  type: LoadBalancer

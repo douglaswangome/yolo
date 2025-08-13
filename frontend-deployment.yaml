@@ -14,12 +14,15 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: douglaswangome/ip2-client:latest
+          image: douglaswangome/ip2-client:v1.0.0
           ports:
             - containerPort: 3000
           env:
-            - name: REACT_APP_API_URL
-              value: "http://ip2-backend:5000"
+            - name: REACT_APP_BACKEND_URL
+              valueFrom:
+                secretKeyRef:
+                  name: frontend-config
+                  key: REACT_APP_BACKEND_URL
 ---
 apiVersion: v1
 kind: Service
